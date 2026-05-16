@@ -1,36 +1,32 @@
 """
-Writing and reading data — persisting DataFrames to disk as Parquet files.
+Joins — combining two DataFrames on a shared key.
 
-Parquet is the standard columnar format for Spark. Writing with partitionBy()
-splits output into subdirectories by column value, which lets Spark skip
-entire partitions when reading (partition pruning). Also shows how to read
-back the full dataset or a single partition directory.
+Covers inner, left, and full outer joins using a small employees/departments
+dataset. Inner keeps only matched rows; left keeps all left-side rows (unmatched
+right side becomes null); outer keeps everything from both sides.
 """
-import os
 from pyspark.sql import SparkSession
 
-spark = SparkSession.builder.appName("write-read").master("local[*]").getOrCreate()
+spark = SparkSession.builder.appName("joins").master("local[*]").getOrCreate()
 
-df = spark.createDataFrame([
-    ("Alice", "eng",  95000),
-    ("Bob",   "mkt",  72000),
-    ("Carol", "eng",  105000),
-    ("Dave",  "mkt",  68000),
-    ("Eve",   "hr",   61000),
-], ["name", "dept", "salary"])
+employees = spark.createDataFrame([
+    (1, "Alice", 10),
+    (2, "Bob",   20),
+    (3, "Carol", 10),
+    (4, "Dave",  99),  # no matching dept
+], ["id", "name", "dept_id"])
 
-out_path = "out/employees"
+departments = spark.createDataFrame([
+    (10, "Engineering"),
+    (20, "Marketing"),
+    (30, "HR"),           # no matching employee
+], ["dept_id", "dept_name"])
 
-print("=== writing parquet partitioned by dept ===")
-df.write.partitionBy("dept").mode("overwrite").parquet(out_path)
+print("=== inner join ===")
+employees.join(departments, on="dept_id", how="inner").show()
 
-print("=== files written ===")
-for root, dirs, files in os.walk(out_path):
-    for f in files:
-        print(os.path.join(root, f))
+print("=== left join (keeps Dave, no dept) ===")
+employees.join(departments, on="dept_id", how="left").show()
 
-print("\n=== reading back ===")
-spark.read.parquet(out_path).orderBy("name").show()
-
-print("=== reading only eng partition ===")
-spark.read.parquet(f"{out_path}/dept=eng").show()
+print("=== full outer join ===")
+employees.join(departments, on="dept_id", how="outer").show()

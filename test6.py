@@ -1,44 +1,60 @@
 """
-SQL interface — querying DataFrames with plain SQL via temporary views.
+Aggregations — summarising data with groupBy, agg, and pivot.
 
-Any DataFrame can be registered as a temp view and then queried with
-spark.sql(). Useful when SQL is more readable than the DataFrame API.
-Demonstrates aggregations, filtering, and ordering on a small orders dataset.
+groupBy().agg() lets you apply multiple aggregation functions in a single
+pass. countDistinct() counts unique values. pivot() rotates row values into
+columns — useful for cross-tabulation. These are all executed on the JVM
+with no Python serialisation overhead.
 """
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import (
+    col, count, countDistinct,
+    avg, sum as spark_sum, min as spark_min, max as spark_max,
+    round as spark_round, stddev,
+)
 
-spark = SparkSession.builder.appName("sql").master("local[*]").getOrCreate()
+spark = SparkSession.builder.appName("aggregations").master("local[*]").getOrCreate()
 
-orders = spark.createDataFrame([
-    (1, "Alice", "Widget",  3, 9.99),
-    (2, "Bob",   "Gadget",  1, 24.99),
-    (3, "Alice", "Widget",  2, 9.99),
-    (4, "Carol", "Doohickey", 5, 4.49),
-    (5, "Bob",   "Widget",  1, 9.99),
-], ["order_id", "customer", "product", "qty", "unit_price"])
+sales = spark.createDataFrame([
+    ("Alice", "eng",  "Widget",   3,  9.99),
+    ("Bob",   "mkt",  "Gadget",   1, 24.99),
+    ("Alice", "eng",  "Widget",   2,  9.99),
+    ("Carol", "hr",   "Doohickey",5,  4.49),
+    ("Bob",   "mkt",  "Widget",   1,  9.99),
+    ("Carol", "hr",   "Gadget",   2, 24.99),
+    ("Alice", "eng",  "Gadget",   1, 24.99),
+    ("Dave",  "mkt",  "Doohickey",3,  4.49),
+], ["rep", "dept", "product", "qty", "unit_price"])
 
-orders.createOrReplaceTempView("orders")
+sales = sales.withColumn("revenue", col("qty") * col("unit_price"))
 
-print("=== total spend per customer ===")
-spark.sql("""
-    SELECT customer, ROUND(SUM(qty * unit_price), 2) AS total_spend
-    FROM orders
-    GROUP BY customer
-    ORDER BY total_spend DESC
-""").show()
+print("=== multi-function agg per department ===")
+sales.groupBy("dept").agg(
+    count("*").alias("num_sales"),
+    countDistinct("rep").alias("unique_reps"),
+    spark_round(spark_sum("revenue"), 2).alias("total_revenue"),
+    spark_round(avg("revenue"), 2).alias("avg_revenue"),
+    spark_round(stddev("revenue"), 2).alias("stddev_revenue"),
+    spark_min("revenue").alias("min_sale"),
+    spark_max("revenue").alias("max_sale"),
+).orderBy("dept").show()
 
-print("=== customers who bought Widget ===")
-spark.sql("""
-    SELECT DISTINCT customer
-    FROM orders
-    WHERE product = 'Widget'
-""").show()
+print("=== agg per rep ===")
+sales.groupBy("rep").agg(
+    spark_sum("qty").alias("total_units"),
+    spark_round(spark_sum("revenue"), 2).alias("total_revenue"),
+).orderBy(col("total_revenue").desc()).show()
 
-print("=== most popular product by qty ===")
-spark.sql("""
-    SELECT product, SUM(qty) AS total_qty
-    FROM orders
-    GROUP BY product
-    ORDER BY total_qty DESC
-    LIMIT 1
-""").show()
+print("=== pivot: revenue per dept per product ===")
+sales.groupBy("dept") \
+     .pivot("product", ["Doohickey", "Gadget", "Widget"]) \
+     .agg(spark_round(spark_sum("revenue"), 2)) \
+     .orderBy("dept") \
+     .show()
+
+print("=== countDistinct across the whole dataset ===")
+sales.select(
+    count("*").alias("total_rows"),
+    countDistinct("rep").alias("unique_reps"),
+    countDistinct("product").alias("unique_products"),
+).show()

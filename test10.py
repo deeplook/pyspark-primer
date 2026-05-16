@@ -1,41 +1,36 @@
 """
-Partitioning and query plans — understanding how Spark distributes data.
+Writing and reading data — persisting DataFrames to disk as Parquet files.
 
-Spark splits data into partitions processed in parallel. repartition() reshuffles
-data (full network shuffle), coalesce() merges partitions cheaply (no shuffle).
-Partitioning by a column co-locates related rows, speeding up joins and
-aggregations on that column. explain() prints the physical query plan so you
-can see what Spark will actually do before it runs.
+Parquet is the standard columnar format for Spark. Writing with partitionBy()
+splits output into subdirectories by column value, which lets Spark skip
+entire partitions when reading (partition pruning). Also shows how to read
+back the full dataset or a single partition directory.
 """
+import os
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, spark_partition_id
 
-spark = SparkSession.builder.appName("partitioning").master("local[*]").getOrCreate()
+spark = SparkSession.builder.appName("write-read").master("local[*]").getOrCreate()
 
-df = spark.range(100).withColumn("value", col("id") * 3)
+df = spark.createDataFrame([
+    ("Alice", "eng",  95000),
+    ("Bob",   "mkt",  72000),
+    ("Carol", "eng",  105000),
+    ("Dave",  "mkt",  68000),
+    ("Eve",   "hr",   61000),
+], ["name", "dept", "salary"])
 
-print(f"default partitions: {df.rdd.getNumPartitions()}")
+out_path = "out/employees"
 
-df4 = df.repartition(4)
-print(f"after repartition(4): {df4.rdd.getNumPartitions()}")
+print("=== writing parquet partitioned by dept ===")
+df.write.partitionBy("dept").mode("overwrite").parquet(out_path)
 
-print("=== rows per partition ===")
-df4.groupBy(spark_partition_id().alias("partition")).count().orderBy("partition").show()
+print("=== files written ===")
+for root, dirs, files in os.walk(out_path):
+    for f in files:
+        print(os.path.join(root, f))
 
-print("=== coalesce to 2 (no shuffle) ===")
-df2 = df4.coalesce(2)
-print(f"after coalesce(2): {df2.rdd.getNumPartitions()}")
+print("\n=== reading back ===")
+spark.read.parquet(out_path).orderBy("name").show()
 
-print("=== repartition by column (each unique value -> own partition bucket) ===")
-df_col = spark.createDataFrame([
-    ("eng", "Alice"), ("mkt", "Bob"), ("eng", "Carol"),
-    ("hr",  "Dave"),  ("mkt", "Eve"), ("hr",  "Frank"),
-], ["dept", "name"])
-
-df_col_part = df_col.repartition(3, "dept")
-df_col_part.withColumn("partition", spark_partition_id()) \
-            .orderBy("dept", "name") \
-            .show()
-
-print("\n=== explain() — physical plan for a filter ===")
-df.filter(col("value") > 50).explain()
+print("=== reading only eng partition ===")
+spark.read.parquet(f"{out_path}/dept=eng").show()

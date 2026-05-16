@@ -1,35 +1,32 @@
 """
-Handling nulls — detecting, dropping, and filling missing values.
+Window functions — computing values relative to a group of rows without collapsing them.
 
-Nulls are common in real data and cause silent errors if ignored. Spark provides
-na.drop() to remove rows, na.fill() to substitute defaults, and when/otherwise
-for conditional replacement. Demonstrates all three approaches on a small
-dataset with intentional gaps.
+Unlike groupBy (which reduces rows), window functions add a new column while
+keeping every row. Demonstrates rank(), lag() (previous row's value), and a
+running sum — all partitioned per person and ordered by month.
 """
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, when
+from pyspark.sql.functions import col, rank, lag, sum as spark_sum
+from pyspark.sql.window import Window
 
-spark = SparkSession.builder.appName("nulls").master("local[*]").getOrCreate()
+spark = SparkSession.builder.appName("windows").master("local[*]").getOrCreate()
 
-df = spark.createDataFrame([
-    (1,  "Alice",   30,    "eng"),
-    (2,  "Bob",     None,  "mkt"),
-    (3,  None,      25,    None),
-    (4,  "Dave",    None,  "hr"),
-    (5,  "Eve",     28,    "eng"),
-], ["id", "name", "age", "dept"])
+sales = spark.createDataFrame([
+    ("Alice", "Jan", 200),
+    ("Alice", "Feb", 150),
+    ("Alice", "Mar", 300),
+    ("Bob",   "Jan", 100),
+    ("Bob",   "Feb", 250),
+    ("Bob",   "Mar", 175),
+], ["name", "month", "amount"])
 
-print("=== original (with nulls) ===")
-df.show()
+by_person = Window.partitionBy("name").orderBy("month")
 
-print("=== drop rows with ANY null ===")
-df.na.drop().show()
+print("=== rank within each person ===")
+sales.withColumn("rank", rank().over(by_person)).show()
 
-print("=== drop rows where 'age' is null ===")
-df.na.drop(subset=["age"]).show()
+print("=== lag: previous month's amount ===")
+sales.withColumn("prev_amount", lag("amount", 1).over(by_person)).show()
 
-print("=== fill nulls with defaults ===")
-df.na.fill({"age": 0, "name": "Unknown", "dept": "none"}).show()
-
-print("=== replace with when/otherwise ===")
-df.withColumn("dept", when(col("dept").isNull(), "unassigned").otherwise(col("dept"))).show()
+print("=== running total per person ===")
+sales.withColumn("running_total", spark_sum("amount").over(by_person)).show()

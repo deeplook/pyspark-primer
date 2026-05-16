@@ -1,32 +1,27 @@
 """
-Window functions — computing values relative to a group of rows without collapsing them.
+Reading CSV files — loading structured data from disk into a DataFrame.
 
-Unlike groupBy (which reduces rows), window functions add a new column while
-keeping every row. Demonstrates rank(), lag() (previous row's value), and a
-running sum — all partitioned per person and ordered by month.
+spark.read.csv() infers column types automatically when inferSchema=True.
+Demonstrates show(), printSchema(), and two groupBy() aggregations on the
+classic tips dataset (~240 rows). Note: Spark cannot read directly from HTTP
+URLs, so the file is downloaded locally first.
 """
+import urllib.request
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, rank, lag, sum as spark_sum
-from pyspark.sql.window import Window
 
-spark = SparkSession.builder.appName("windows").master("local[*]").getOrCreate()
+spark = SparkSession.builder.appName("test").master("local[*]").getOrCreate()
 
-sales = spark.createDataFrame([
-    ("Alice", "Jan", 200),
-    ("Alice", "Feb", 150),
-    ("Alice", "Mar", 300),
-    ("Bob",   "Jan", 100),
-    ("Bob",   "Feb", 250),
-    ("Bob",   "Mar", 175),
-], ["name", "month", "amount"])
+import os
+csv_path = "tips.csv"
+if not os.path.exists(csv_path):
+    urllib.request.urlretrieve(
+        "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv",
+        csv_path,
+    )
 
-by_person = Window.partitionBy("name").orderBy("month")
+tips = spark.read.csv(csv_path, header=True, inferSchema=True)
 
-print("=== rank within each person ===")
-sales.withColumn("rank", rank().over(by_person)).show()
-
-print("=== lag: previous month's amount ===")
-sales.withColumn("prev_amount", lag("amount", 1).over(by_person)).show()
-
-print("=== running total per person ===")
-sales.withColumn("running_total", spark_sum("amount").over(by_person)).show()
+tips.show(5)           # display first 5 rows
+tips.printSchema()     # show column types
+tips.groupBy("day").count().show()
+tips.groupBy("smoker").agg({"tip": "mean"}).show()

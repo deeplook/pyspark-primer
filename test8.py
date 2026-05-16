@@ -1,38 +1,44 @@
 """
-User-Defined Functions (UDFs) — applying custom Python logic to DataFrame columns.
+SQL interface — querying DataFrames with plain SQL via temporary views.
 
-UDFs let you use arbitrary Python when built-in Spark functions aren't enough.
-They are slower than native functions (data serialises between JVM and Python),
-so prefer built-ins where possible. Demonstrates extracting an email domain
-and converting a numeric score to a letter grade.
+Any DataFrame can be registered as a temp view and then queried with
+spark.sql(). Useful when SQL is more readable than the DataFrame API.
+Demonstrates aggregations, filtering, and ordering on a small orders dataset.
 """
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, udf
-from pyspark.sql.types import StringType, IntegerType
 
-spark = SparkSession.builder.appName("udfs").master("local[*]").getOrCreate()
+spark = SparkSession.builder.appName("sql").master("local[*]").getOrCreate()
 
-df = spark.createDataFrame([
-    ("alice@example.com",  82),
-    ("bob@work.org",       91),
-    ("carol@example.com",  55),
-    ("dave@school.edu",    74),
-], ["email", "score"])
+orders = spark.createDataFrame([
+    (1, "Alice", "Widget",  3, 9.99),
+    (2, "Bob",   "Gadget",  1, 24.99),
+    (3, "Alice", "Widget",  2, 9.99),
+    (4, "Carol", "Doohickey", 5, 4.49),
+    (5, "Bob",   "Widget",  1, 9.99),
+], ["order_id", "customer", "product", "qty", "unit_price"])
 
-@udf(StringType())
-def email_domain(email: str) -> str:
-    return email.split("@")[-1] if email else None
+orders.createOrReplaceTempView("orders")
 
-@udf(StringType())
-def grade(score: int) -> str:
-    if score is None:
-        return None
-    if score >= 90: return "A"
-    if score >= 80: return "B"
-    if score >= 70: return "C"
-    return "F"
+print("=== total spend per customer ===")
+spark.sql("""
+    SELECT customer, ROUND(SUM(qty * unit_price), 2) AS total_spend
+    FROM orders
+    GROUP BY customer
+    ORDER BY total_spend DESC
+""").show()
 
-print("=== extract domain + assign grade ===")
-df.withColumn("domain", email_domain(col("email"))) \
-  .withColumn("grade",  grade(col("score"))) \
-  .show()
+print("=== customers who bought Widget ===")
+spark.sql("""
+    SELECT DISTINCT customer
+    FROM orders
+    WHERE product = 'Widget'
+""").show()
+
+print("=== most popular product by qty ===")
+spark.sql("""
+    SELECT product, SUM(qty) AS total_qty
+    FROM orders
+    GROUP BY product
+    ORDER BY total_qty DESC
+    LIMIT 1
+""").show()
