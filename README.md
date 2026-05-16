@@ -76,6 +76,14 @@ each one builds on concepts introduced by the previous.
 | `test11.py` | Handling nulls — `na.drop`, `na.fill`, `when`/`otherwise` |
 | `test12.py` | User-Defined Functions (UDFs) — custom Python logic on columns |
 | `test13.py` | Partitioning & query plans — `repartition`, `coalesce`, `explain()` |
+| `test14.py` | Explicit schemas — `StructType`, `StructField`, DDL strings |
+| `test15.py` | Reading JSON — nested structs, `ArrayType`, dot-notation access |
+| `test16.py` | Nested data — `explode`, `posexplode`, `map_keys`/`map_values` |
+| `test17.py` | Deduplication — `distinct`, `dropDuplicates` by key |
+| `test18.py` | Set operations — `union`, `unionByName`, `intersect`, `subtract` |
+| `test19.py` | Caching — `cache`, `persist`, `unpersist`, storage levels |
+| `test20.py` | Broadcast joins — eliminating shuffle for small lookup tables |
+| `test21.py` | Train/test split — `randomSplit`, `sample`, bootstrapping |
 
 ## Running all tests
 
