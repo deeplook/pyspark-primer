@@ -19,7 +19,7 @@ records = [
     {"id": 3, "name": "Carol", "scores": [95, 99, 91], "address": {"city": "NYC", "zip": "10002"}},
 ]
 
-json_path = "out/people.json"
+json_path = "out/people.jsonl"
 os.makedirs("out", exist_ok=True)
 with open(json_path, "w") as f:
     for r in records:
