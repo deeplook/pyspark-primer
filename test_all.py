@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-MODULES = sorted(Path(__file__).parent.glob("test[0-9]*.py"))
+MODULES = sorted(Path(__file__).parent.glob("[0-9][0-9]_*.py"))
 
 
 @pytest.mark.parametrize("module", MODULES, ids=lambda p: p.name)

@@ -63,27 +63,27 @@ each one builds on concepts introduced by the previous.
 
 | File | Topic |
 |------|-------|
-| `test1.py`  | SparkSession — the entry point to every Spark application |
-| `test2.py`  | In-memory DataFrames — `createDataFrame`, `show`, `filter`, `groupBy` |
-| `test3.py`  | Lazy evaluation — transformations vs actions, `explain()` |
-| `test4.py`  | Column expressions — string, math, date functions, `when`/`coalesce` |
-| `test5.py`  | Reading CSV — `inferSchema`, `printSchema`, basic aggregations |
-| `test6.py`  | Aggregations — multi-function `agg`, `countDistinct`, `pivot` |
-| `test7.py`  | Joins — inner, left, and full outer joins |
-| `test8.py`  | SQL interface — `createOrReplaceTempView`, `spark.sql()` |
-| `test9.py`  | Window functions — `rank`, `lag`, running totals |
-| `test10.py` | Writing & reading Parquet — `partitionBy`, partition pruning |
-| `test11.py` | Handling nulls — `na.drop`, `na.fill`, `when`/`otherwise` |
-| `test12.py` | User-Defined Functions (UDFs) — custom Python logic on columns |
-| `test13.py` | Partitioning & query plans — `repartition`, `coalesce`, `explain()` |
-| `test14.py` | Explicit schemas — `StructType`, `StructField`, DDL strings |
-| `test15.py` | Reading JSON — nested structs, `ArrayType`, dot-notation access |
-| `test16.py` | Nested data — `explode`, `posexplode`, `map_keys`/`map_values` |
-| `test17.py` | Deduplication — `distinct`, `dropDuplicates` by key |
-| `test18.py` | Set operations — `union`, `unionByName`, `intersect`, `subtract` |
-| `test19.py` | Caching — `cache`, `persist`, `unpersist`, storage levels |
-| `test20.py` | Broadcast joins — eliminating shuffle for small lookup tables |
-| `test21.py` | Train/test split — `randomSplit`, `sample`, bootstrapping |
+| `01_spark_session.py`    | SparkSession — the entry point to every Spark application |
+| `02_dataframes.py`       | In-memory DataFrames — `createDataFrame`, `show`, `filter`, `groupBy` |
+| `03_lazy_evaluation.py`  | Lazy evaluation — transformations vs actions, `explain()` |
+| `04_column_functions.py` | Column expressions — string, math, date functions, `when`/`coalesce` |
+| `05_reading_csv.py`      | Reading CSV — `inferSchema`, `printSchema`, basic aggregations |
+| `06_aggregations.py`     | Aggregations — multi-function `agg`, `countDistinct`, `pivot` |
+| `07_joins.py`            | Joins — inner, left, and full outer joins |
+| `08_sql_interface.py`    | SQL interface — `createOrReplaceTempView`, `spark.sql()` |
+| `09_window_functions.py` | Window functions — `rank`, `lag`, running totals |
+| `10_parquet.py`          | Writing & reading Parquet — `partitionBy`, partition pruning |
+| `11_null_handling.py`    | Handling nulls — `na.drop`, `na.fill`, `when`/`otherwise` |
+| `12_udfs.py`             | User-Defined Functions (UDFs) — custom Python logic on columns |
+| `13_partitioning.py`     | Partitioning & query plans — `repartition`, `coalesce`, `explain()` |
+| `14_schemas.py`          | Explicit schemas — `StructType`, `StructField`, DDL strings |
+| `15_reading_json.py`     | Reading JSON — nested structs, `ArrayType`, dot-notation access |
+| `16_nested_explode.py`   | Nested data — `explode`, `posexplode`, `map_keys`/`map_values` |
+| `17_deduplication.py`    | Deduplication — `distinct`, `dropDuplicates` by key |
+| `18_set_operations.py`   | Set operations — `union`, `unionByName`, `intersect`, `subtract` |
+| `19_caching.py`          | Caching — `cache`, `persist`, `unpersist`, storage levels |
+| `20_broadcast_joins.py`  | Broadcast joins — eliminating shuffle for small lookup tables |
+| `21_sampling.py`         | Train/test split — `randomSplit`, `sample`, bootstrapping |
 
 ## Running all tests
 
@@ -97,6 +97,6 @@ uv run pytest test_all.py -v
 
 - The `WARN NativeCodeLoader` message on startup is harmless — it just means
   the native Hadoop library isn't available, which is expected on macOS.
-- `test5.py` downloads `tips.csv` from GitHub on first run and saves it
-  locally. Subsequent runs use the local copy.
-- `test10.py` writes Parquet output to `out/employees/`.
+- `05_reading_csv.py` downloads `tips.csv` from GitHub on first run and saves
+  it locally. Subsequent runs use the local copy.
+- `10_parquet.py` writes Parquet output to `out/employees/`.
