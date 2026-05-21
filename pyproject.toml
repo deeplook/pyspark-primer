@@ -1,7 +1,7 @@
 [project]
 name = "sparky"
 version = "0.1.0"
-description = "Add your description here"
+description = "Tutorial for getting started with PySpark"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
