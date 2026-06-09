@@ -1,13 +1,37 @@
 [project]
-name = "sparky"
+name = "pyspark-primer"
 version = "0.1.0"
-description = "Tutorial for getting started with PySpark"
+description = "Small, self-contained PySpark scripts for learning the DataFrame API"
 readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Dinu Gherman", email = "gherman@darwin.in-berlin.de" },
+]
+keywords = ["pyspark", "spark", "dataframe", "tutorial", "learning"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Education",
+]
 requires-python = ">=3.12"
 dependencies = [
-    "ipython>=9.13.0",
     "pyspark>=4.1.1",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.urls]
+Repository = "https://github.com/deeplook/pyspark-primer"
+
+[tool.pytest.ini_options]
+testpaths = ["test_all.py"]
 
 [dependency-groups]
 dev = [

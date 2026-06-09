@@ -1,4 +1,4 @@
-# Sparky — PySpark learning scripts
+# PySpark-Primer
 
 A collection of small, self-contained PySpark scripts for learning the Spark
 DataFrame API on a local machine.
@@ -90,7 +90,7 @@ each one builds on concepts introduced by the previous.
 A pytest suite checks that every module runs without errors:
 
 ```bash
-uv run pytest test_all.py -v
+uv run python -m pytest test_all.py -v
 ```
 
 ## Notes
