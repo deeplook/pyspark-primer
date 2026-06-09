@@ -1,5 +1,9 @@
 # PySpark-Primer
 
+[![CI](https://github.com/deeplook/pyspark-primer/actions/workflows/ci.yml/badge.svg)](https://github.com/deeplook/pyspark-primer/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/deeplook/pyspark-primer)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/downloads/release/python-3120/)
+
 A collection of small, self-contained PySpark scripts for learning the Spark
 DataFrame API on a local machine.
 
