@@ -3,9 +3,17 @@
 [![CI](https://github.com/deeplook/pyspark-primer/actions/workflows/ci.yml/badge.svg)](https://github.com/deeplook/pyspark-primer/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/deeplook/pyspark-primer)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/downloads/release/python-3120/)
+[![Apache Spark](https://img.shields.io/badge/Apache%20Spark-4.1-E25A1C?logo=apachespark&logoColor=white)](https://spark.apache.org/)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/deeplook)
 
 A collection of small, self-contained PySpark scripts for learning the Spark
 DataFrame API on a local machine.
+
+## Sample output
+
+A recorded demo session — click the image to play it on [Asciinema]:
+
+[![asciicast](https://asciinema.org/a/DLdle1UqtDPjDmIP.png)](https://asciinema.org/a/DLdle1UqtDPjDmIP)
 
 ## Prerequisites
 
@@ -143,3 +151,5 @@ uv run python -m pytest -v
   notice is harmless.
 - `examples/05_reading_csv.py` reads the included `data/tips.csv` dataset.
 - `examples/10_parquet.py` writes Parquet output to `out/employees/`.
+
+[Asciinema]: https://asciinema.org
