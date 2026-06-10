@@ -12,7 +12,9 @@ from pathlib import Path
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 
-spark = SparkSession.builder.appName("json").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("json").master("local[*]")).getOrCreate()
 
 records = [
     {"id": 1, "name": "Alice", "scores": [85, 92, 78], "address": {"city": "NYC", "zip": "10001"}},

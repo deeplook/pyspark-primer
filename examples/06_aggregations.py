@@ -13,7 +13,9 @@ from pyspark.sql.functions import (
     round as spark_round, stddev,
 )
 
-spark = SparkSession.builder.appName("aggregations").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("aggregations").master("local[*]")).getOrCreate()
 
 sales = spark.createDataFrame([
     ("Alice", "eng",  "Widget",   3,  9.99),

@@ -9,7 +9,9 @@ pair; map_keys() / map_values() extract them as arrays instead.
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, explode, posexplode, map_keys, map_values
 
-spark = SparkSession.builder.appName("nested").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("nested").master("local[*]")).getOrCreate()
 
 df = spark.createDataFrame([
     (1, "Alice", [85, 92, 78], {"math": "A", "english": "B"}),

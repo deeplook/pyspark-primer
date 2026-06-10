@@ -10,7 +10,9 @@ from pathlib import Path
 
 from pyspark.sql import SparkSession
 
-spark = SparkSession.builder.appName("test").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("test").master("local[*]")).getOrCreate()
 
 root_dir = Path(__file__).resolve().parent.parent
 csv_path = root_dir / "data" / "tips.csv"

@@ -8,10 +8,13 @@ no shuffle, significantly faster. explain() shows BroadcastHashJoin vs
 SortMergeJoin so you can confirm the plan is what you expect.
 """
 import time
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import broadcast, col
 
-spark = SparkSession.builder.appName("broadcast").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("broadcast").master("local[*]")).getOrCreate()
 
 orders = spark.range(500_000).withColumn("dept_id", (col("id") % 5).cast("int"))
 

@@ -9,7 +9,9 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, rank, lag, sum as spark_sum
 from pyspark.sql.window import Window
 
-spark = SparkSession.builder.appName("windows").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("windows").master("local[*]")).getOrCreate()
 
 sales = spark.createDataFrame([
     ("Alice", "Jan", 200),

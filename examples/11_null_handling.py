@@ -9,7 +9,9 @@ dataset with intentional gaps.
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, when
 
-spark = SparkSession.builder.appName("nulls").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("nulls").master("local[*]")).getOrCreate()
 
 df = spark.createDataFrame([
     (1,  "Alice",   30,    "eng"),

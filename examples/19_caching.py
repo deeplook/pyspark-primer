@@ -7,11 +7,14 @@ skip recomputation. persist() gives finer control over storage level.
 Always unpersist() when done to free executor memory.
 """
 import time
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 from pyspark.storagelevel import StorageLevel
 
-spark = SparkSession.builder.appName("caching").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("caching").master("local[*]")).getOrCreate()
 
 df = spark.range(2_000_000).withColumn("value", col("id") % 1000)
 filtered = df.filter(col("value") > 500)

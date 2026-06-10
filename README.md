@@ -137,8 +137,9 @@ uv run python -m pytest -v
 
 ## Notes
 
-- The `WARN NativeCodeLoader` message on startup is harmless for these local
-  examples. It means Spark could not load the platform-specific native Hadoop
-  library and will use its built-in Java implementations instead.
+- The included `conf/log4j2.properties` profile suppresses routine Spark and
+  Hadoop startup logging. Java may still print `Using incubator modules:
+  jdk.incubator.vector`; Spark enables that Java module automatically and the
+  notice is harmless.
 - `examples/05_reading_csv.py` reads the included `data/tips.csv` dataset.
 - `examples/10_parquet.py` writes Parquet output to `out/employees/`.

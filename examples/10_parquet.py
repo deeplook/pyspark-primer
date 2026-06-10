@@ -11,7 +11,9 @@ from pathlib import Path
 
 from pyspark.sql import SparkSession
 
-spark = SparkSession.builder.appName("write-read").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("write-read").master("local[*]")).getOrCreate()
 
 df = spark.createDataFrame([
     ("Alice", "eng",  95000),

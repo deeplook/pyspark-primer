@@ -8,7 +8,9 @@ by generating a range of 1000 numbers and counting them.
 """
 from pyspark.sql import SparkSession
 
-spark = SparkSession.builder.appName("test").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("test").master("local[*]")).getOrCreate()
 
 count = spark.range(1000).count()
 

@@ -9,7 +9,9 @@ results are reproducible across runs.
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 
-spark = SparkSession.builder.appName("sampling").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("sampling").master("local[*]")).getOrCreate()
 
 df = spark.range(1000).withColumn("value", col("id") * 3)
 

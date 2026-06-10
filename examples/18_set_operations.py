@@ -9,7 +9,9 @@ left side that do not appear on the right.
 """
 from pyspark.sql import SparkSession
 
-spark = SparkSession.builder.appName("set-ops").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("set-ops").master("local[*]")).getOrCreate()
 
 q1 = spark.createDataFrame([
     ("Alice", "eng"), ("Bob", "mkt"), ("Carol", "eng"),

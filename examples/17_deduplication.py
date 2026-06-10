@@ -8,7 +8,9 @@ form in ETL pipelines where a surrogate id or timestamp differs per copy.
 """
 from pyspark.sql import SparkSession
 
-spark = SparkSession.builder.appName("dedup").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("dedup").master("local[*]")).getOrCreate()
 
 df = spark.createDataFrame([
     (1, "Alice", "eng",  95000),

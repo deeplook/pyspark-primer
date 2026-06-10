@@ -12,7 +12,9 @@ task. Use explain() to inspect the plan; use count() / show() to execute it.
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 
-spark = SparkSession.builder.appName("lazy").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("lazy").master("local[*]")).getOrCreate()
 
 df = spark.range(1_000_000)  # transformation — no work done yet
 

@@ -7,7 +7,9 @@ Demonstrates aggregations, filtering, and ordering on a small orders dataset.
 """
 from pyspark.sql import SparkSession
 
-spark = SparkSession.builder.appName("sql").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("sql").master("local[*]")).getOrCreate()
 
 orders = spark.createDataFrame([
     (1, "Alice", "Widget",  3, 9.99),

@@ -16,7 +16,9 @@ from pyspark.sql.functions import (
 )
 from pyspark.sql.types import DoubleType
 
-spark = SparkSession.builder.appName("functions").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("functions").master("local[*]")).getOrCreate()
 
 people = spark.createDataFrame([
     (1, "  Alice  ", "1990-06-15", 82500.456),

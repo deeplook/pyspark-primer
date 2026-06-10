@@ -11,7 +11,9 @@ from pyspark.sql.types import (
     StructType, StructField, IntegerType, StringType, DoubleType, BooleanType,
 )
 
-spark = SparkSession.builder.appName("schemas").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("schemas").master("local[*]")).getOrCreate()
 
 schema = StructType([
     StructField("id",     IntegerType(), nullable=False),

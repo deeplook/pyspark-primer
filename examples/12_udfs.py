@@ -10,7 +10,9 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, udf
 from pyspark.sql.types import StringType, IntegerType
 
-spark = SparkSession.builder.appName("udfs").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("udfs").master("local[*]")).getOrCreate()
 
 df = spark.createDataFrame([
     ("alice@example.com",  82),

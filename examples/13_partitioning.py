@@ -10,7 +10,9 @@ can see what Spark will actually do before it runs.
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, spark_partition_id
 
-spark = SparkSession.builder.appName("partitioning").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("partitioning").master("local[*]")).getOrCreate()
 
 df = spark.range(100).withColumn("value", col("id") * 3)
 

@@ -7,7 +7,9 @@ right side becomes null); outer keeps everything from both sides.
 """
 from pyspark.sql import SparkSession
 
-spark = SparkSession.builder.appName("joins").master("local[*]").getOrCreate()
+from _spark_config import configure_spark
+
+spark = configure_spark(SparkSession.builder.appName("joins").master("local[*]")).getOrCreate()
 
 employees = spark.createDataFrame([
     (1, "Alice", 10),
