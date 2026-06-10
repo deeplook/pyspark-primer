@@ -30,8 +30,11 @@ build-backend = "hatchling.build"
 [project.urls]
 Repository = "https://github.com/deeplook/pyspark-primer"
 
+[tool.uv]
+package = false
+
 [tool.pytest.ini_options]
-testpaths = ["test_all.py"]
+testpaths = ["tests"]
 
 [dependency-groups]
 dev = [

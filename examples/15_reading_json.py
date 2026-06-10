@@ -7,7 +7,8 @@ objects become StructType columns, arrays become ArrayType columns.
 Nested fields are accessed with dot notation: col("address.city").
 """
 import json
-import os
+from pathlib import Path
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 
@@ -19,13 +20,14 @@ records = [
     {"id": 3, "name": "Carol", "scores": [95, 99, 91], "address": {"city": "NYC", "zip": "10002"}},
 ]
 
-json_path = "out/people.jsonl"
-os.makedirs("out", exist_ok=True)
+root_dir = Path(__file__).resolve().parent.parent
+json_path = root_dir / "out" / "people.jsonl"
+json_path.parent.mkdir(exist_ok=True)
 with open(json_path, "w") as f:
     for r in records:
         f.write(json.dumps(r) + "\n")
 
-df = spark.read.json(json_path)
+df = spark.read.json(str(json_path))
 
 print("=== inferred schema (nested struct + array) ===")
 df.printSchema()

@@ -7,6 +7,8 @@ entire partitions when reading (partition pruning). Also shows how to read
 back the full dataset or a single partition directory.
 """
 import os
+from pathlib import Path
+
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.appName("write-read").master("local[*]").getOrCreate()
@@ -19,10 +21,11 @@ df = spark.createDataFrame([
     ("Eve",   "hr",   61000),
 ], ["name", "dept", "salary"])
 
-out_path = "out/employees"
+root_dir = Path(__file__).resolve().parent.parent
+out_path = root_dir / "out" / "employees"
 
 print("=== writing parquet partitioned by dept ===")
-df.write.partitionBy("dept").mode("overwrite").parquet(out_path)
+df.write.partitionBy("dept").mode("overwrite").parquet(str(out_path))
 
 print("=== files written ===")
 for root, dirs, files in os.walk(out_path):
@@ -30,7 +33,7 @@ for root, dirs, files in os.walk(out_path):
         print(os.path.join(root, f))
 
 print("\n=== reading back ===")
-spark.read.parquet(out_path).orderBy("name").show()
+spark.read.parquet(str(out_path)).orderBy("name").show()
 
 print("=== reading only eng partition ===")
-spark.read.parquet(f"{out_path}/dept=eng").show()
+spark.read.parquet(str(out_path / "dept=eng")).show()

@@ -7,7 +7,8 @@ from pathlib import Path
 
 import pytest
 
-MODULES = sorted(Path(__file__).parent.glob("[0-9][0-9]_*.py"))
+ROOT_DIR = Path(__file__).resolve().parent.parent
+MODULES = sorted((ROOT_DIR / "examples").glob("[0-9][0-9]_*.py"))
 
 
 @pytest.mark.parametrize("module", MODULES, ids=lambda p: p.name)
