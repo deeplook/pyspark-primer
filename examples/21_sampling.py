@@ -6,12 +6,15 @@ the standard first step before training a model. sample() draws a random
 fraction for quick exploration or bootstrapping. Both accept a seed so
 results are reproducible across runs.
 """
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 
 from _spark_config import configure_spark
 
-spark = configure_spark(SparkSession.builder.appName("sampling").master("local[*]")).getOrCreate()
+spark = configure_spark(
+    SparkSession.builder.appName("sampling").master("local[*]")
+).getOrCreate()
 
 df = spark.range(1000).withColumn("value", col("id") * 3)
 

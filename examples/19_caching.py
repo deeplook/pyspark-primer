@@ -6,6 +6,7 @@ cache() stores it in memory after the first action so subsequent actions
 skip recomputation. persist() gives finer control over storage level.
 Always unpersist() when done to free executor memory.
 """
+
 import time
 
 from pyspark.sql import SparkSession
@@ -14,7 +15,9 @@ from pyspark.storagelevel import StorageLevel
 
 from _spark_config import configure_spark
 
-spark = configure_spark(SparkSession.builder.appName("caching").master("local[*]")).getOrCreate()
+spark = configure_spark(
+    SparkSession.builder.appName("caching").master("local[*]")
+).getOrCreate()
 
 df = spark.range(2_000_000).withColumn("value", col("id") % 1000)
 filtered = df.filter(col("value") > 500)
@@ -29,8 +32,8 @@ cached = filtered.cache()
 
 print("\n=== with cache: materialised on first action ===")
 t0 = time.time()
-cached.count()   # materialises
-cached.count()   # served from memory
+cached.count()  # materialises
+cached.count()  # served from memory
 print(f"two counts, with cache:  {time.time() - t0:.2f}s")
 cached.unpersist()
 

@@ -5,19 +5,25 @@ Any DataFrame can be registered as a temp view and then queried with
 spark.sql(). Useful when SQL is more readable than the DataFrame API.
 Demonstrates aggregations, filtering, and ordering on a small orders dataset.
 """
+
 from pyspark.sql import SparkSession
 
 from _spark_config import configure_spark
 
-spark = configure_spark(SparkSession.builder.appName("sql").master("local[*]")).getOrCreate()
+spark = configure_spark(
+    SparkSession.builder.appName("sql").master("local[*]")
+).getOrCreate()
 
-orders = spark.createDataFrame([
-    (1, "Alice", "Widget",  3, 9.99),
-    (2, "Bob",   "Gadget",  1, 24.99),
-    (3, "Alice", "Widget",  2, 9.99),
-    (4, "Carol", "Doohickey", 5, 4.49),
-    (5, "Bob",   "Widget",  1, 9.99),
-], ["order_id", "customer", "product", "qty", "unit_price"])
+orders = spark.createDataFrame(
+    [
+        (1, "Alice", "Widget", 3, 9.99),
+        (2, "Bob", "Gadget", 1, 24.99),
+        (3, "Alice", "Widget", 2, 9.99),
+        (4, "Carol", "Doohickey", 5, 4.49),
+        (5, "Bob", "Widget", 1, 9.99),
+    ],
+    ["order_id", "customer", "product", "qty", "unit_price"],
+)
 
 orders.createOrReplaceTempView("orders")
 

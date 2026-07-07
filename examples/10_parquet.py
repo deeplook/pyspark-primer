@@ -6,6 +6,7 @@ splits output into subdirectories by column value, which lets Spark skip
 entire partitions when reading (partition pruning). Also shows how to read
 back the full dataset or a single partition directory.
 """
+
 import os
 from pathlib import Path
 
@@ -13,15 +14,20 @@ from pyspark.sql import SparkSession
 
 from _spark_config import configure_spark
 
-spark = configure_spark(SparkSession.builder.appName("write-read").master("local[*]")).getOrCreate()
+spark = configure_spark(
+    SparkSession.builder.appName("write-read").master("local[*]")
+).getOrCreate()
 
-df = spark.createDataFrame([
-    ("Alice", "eng",  95000),
-    ("Bob",   "mkt",  72000),
-    ("Carol", "eng",  105000),
-    ("Dave",  "mkt",  68000),
-    ("Eve",   "hr",   61000),
-], ["name", "dept", "salary"])
+df = spark.createDataFrame(
+    [
+        ("Alice", "eng", 95000),
+        ("Bob", "mkt", 72000),
+        ("Carol", "eng", 105000),
+        ("Dave", "mkt", 68000),
+        ("Eve", "hr", 61000),
+    ],
+    ["name", "dept", "salary"],
+)
 
 root_dir = Path(__file__).resolve().parent.parent
 out_path = root_dir / "out" / "employees"

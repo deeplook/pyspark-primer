@@ -1,25 +1,21 @@
+"""Smoke test: every example module must run cleanly end to end.
+
+Each example is executed in-process via runpy so that SparkSession.getOrCreate()
+returns the already-running session from the spark fixture rather than cold-starting
+a new JVM. The session is shared across all 21 tests; individual examples cannot
+stop it because none of them call spark.stop().
 """
-Pytest suite that runs each tutorial module as a subprocess and asserts it exits cleanly.
-"""
-import subprocess
-import sys
+
+import runpy
 from pathlib import Path
 
 import pytest
+from pyspark.sql import SparkSession
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 MODULES = sorted((ROOT_DIR / "examples").glob("[0-9][0-9]_*.py"))
 
 
 @pytest.mark.parametrize("module", MODULES, ids=lambda p: p.name)
-def test_module_runs(module: Path) -> None:
-    result = subprocess.run(
-        [sys.executable, str(module)],
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 0, (
-        f"{module.name} exited with code {result.returncode}\n"
-        f"--- stdout ---\n{result.stdout[-2000:]}\n"
-        f"--- stderr ---\n{result.stderr[-2000:]}"
-    )
+def test_module_runs(module: Path, spark: SparkSession) -> None:
+    runpy.run_path(str(module), run_name="__main__")

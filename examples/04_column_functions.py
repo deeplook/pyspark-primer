@@ -6,26 +6,45 @@ JVM and are far faster than Python UDFs. This script walks through the most
 common categories: column selection, string ops, math, dates, casting, and
 conditional logic.
 """
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
-    col, lit,
-    upper, lower, length, substring, concat, trim,
-    round as spark_round, abs as spark_abs, sqrt, pow as spark_pow,
-    current_date, date_format, datediff, to_date,
-    when, coalesce,
+    col,
+    lit,
+    upper,
+    lower,
+    length,
+    substring,
+    concat,
+    trim,
+    round as spark_round,
+    abs as spark_abs,
+    sqrt,
+    pow as spark_pow,
+    current_date,
+    date_format,
+    datediff,
+    to_date,
+    when,
+    coalesce,
 )
 from pyspark.sql.types import DoubleType
 
 from _spark_config import configure_spark
 
-spark = configure_spark(SparkSession.builder.appName("functions").master("local[*]")).getOrCreate()
+spark = configure_spark(
+    SparkSession.builder.appName("functions").master("local[*]")
+).getOrCreate()
 
-people = spark.createDataFrame([
-    (1, "  Alice  ", "1990-06-15", 82500.456),
-    (2, "Bob",       "1985-11-30", 67000.0),
-    (3, "carol",     "2000-03-08", 91250.789),
-    (4, "Dave",      "1978-09-22", None),
-], ["id", "name", "birthdate", "salary"])
+people = spark.createDataFrame(
+    [
+        (1, "  Alice  ", "1990-06-15", 82500.456),
+        (2, "Bob", "1985-11-30", 67000.0),
+        (3, "carol", "2000-03-08", 91250.789),
+        (4, "Dave", "1978-09-22", None),
+    ],
+    ["id", "name", "birthdate", "salary"],
+)
 
 print("=== string functions ===")
 people.select(
@@ -55,10 +74,9 @@ people.select(
 ).show()
 
 print("=== casting and withColumn ===")
-people.withColumn("salary_int", col("salary").cast("int")) \
-      .withColumn("id_str",     col("id").cast("string")) \
-      .select("id", "id_str", "salary", "salary_int") \
-      .show()
+people.withColumn("salary_int", col("salary").cast("int")).withColumn(
+    "id_str", col("id").cast("string")
+).select("id", "id_str", "salary", "salary_int").show()
 
 print("=== conditional logic: when / otherwise / coalesce ===")
 people.withColumn(
@@ -66,8 +84,5 @@ people.withColumn(
     when(col("salary") >= 90000, "high")
     .when(col("salary") >= 70000, "mid")
     .when(col("salary").isNotNull(), "low")
-    .otherwise("unknown")
-).withColumn(
-    "salary_safe",
-    coalesce(col("salary"), lit(0.0))
-).show()
+    .otherwise("unknown"),
+).withColumn("salary_safe", coalesce(col("salary"), lit(0.0))).show()

@@ -5,22 +5,28 @@ Unlike groupBy (which reduces rows), window functions add a new column while
 keeping every row. Demonstrates rank(), lag() (previous row's value), and a
 running sum — all partitioned per person and ordered by month.
 """
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, rank, lag, sum as spark_sum
 from pyspark.sql.window import Window
 
 from _spark_config import configure_spark
 
-spark = configure_spark(SparkSession.builder.appName("windows").master("local[*]")).getOrCreate()
+spark = configure_spark(
+    SparkSession.builder.appName("windows").master("local[*]")
+).getOrCreate()
 
-sales = spark.createDataFrame([
-    ("Alice", "Jan", 200),
-    ("Alice", "Feb", 150),
-    ("Alice", "Mar", 300),
-    ("Bob",   "Jan", 100),
-    ("Bob",   "Feb", 250),
-    ("Bob",   "Mar", 175),
-], ["name", "month", "amount"])
+sales = spark.createDataFrame(
+    [
+        ("Alice", "Jan", 200),
+        ("Alice", "Feb", 150),
+        ("Alice", "Mar", 300),
+        ("Bob", "Jan", 100),
+        ("Bob", "Feb", 250),
+        ("Bob", "Mar", 175),
+    ],
+    ["name", "month", "amount"],
+)
 
 by_person = Window.partitionBy("name").orderBy("month")
 

@@ -7,12 +7,15 @@ Partitioning by a column co-locates related rows, speeding up joins and
 aggregations on that column. explain() prints the physical query plan so you
 can see what Spark will actually do before it runs.
 """
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, spark_partition_id
 
 from _spark_config import configure_spark
 
-spark = configure_spark(SparkSession.builder.appName("partitioning").master("local[*]")).getOrCreate()
+spark = configure_spark(
+    SparkSession.builder.appName("partitioning").master("local[*]")
+).getOrCreate()
 
 df = spark.range(100).withColumn("value", col("id") * 3)
 
@@ -29,15 +32,20 @@ df2 = df4.coalesce(2)
 print(f"after coalesce(2): {df2.rdd.getNumPartitions()}")
 
 print("=== repartition by column (each unique value -> own partition bucket) ===")
-df_col = spark.createDataFrame([
-    ("eng", "Alice"), ("mkt", "Bob"), ("eng", "Carol"),
-    ("hr",  "Dave"),  ("mkt", "Eve"), ("hr",  "Frank"),
-], ["dept", "name"])
+df_col = spark.createDataFrame(
+    [
+        ("eng", "Alice"),
+        ("mkt", "Bob"),
+        ("eng", "Carol"),
+        ("hr", "Dave"),
+        ("mkt", "Eve"),
+        ("hr", "Frank"),
+    ],
+    ["dept", "name"],
+)
 
 df_col_part = df_col.repartition(3, "dept")
-df_col_part.withColumn("partition", spark_partition_id()) \
-            .orderBy("dept", "name") \
-            .show()
+df_col_part.withColumn("partition", spark_partition_id()).orderBy("dept", "name").show()
 
 print("\n=== explain() — physical plan for a filter ===")
 df.filter(col("value") > 50).explain()
