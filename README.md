@@ -106,6 +106,34 @@ PySpark 4.x bundles its own Spark distribution and unpacks it at runtime.
 The same `uv sync`, `uv run examples/<file>`, and test commands below work in
 macOS/Linux shells and Windows PowerShell.
 
+## Docker
+
+If you would rather not install Java, uv, and Python on the host, a container
+ships all three. Build the image once:
+
+```bash
+docker build -t pyspark-primer .
+```
+
+The entrypoint is `uv run`, so pass any script path to run an example:
+
+```bash
+docker run --rm pyspark-primer examples/02_dataframes.py
+```
+
+Run the test suite the same way:
+
+```bash
+docker run --rm pyspark-primer python -m pytest -v
+```
+
+To iterate on the examples without rebuilding, mount them over the copy baked
+into the image:
+
+```bash
+docker run --rm -v "$PWD/examples:/app/examples" pyspark-primer examples/02_dataframes.py
+```
+
 ## Modules
 
 Run any script with `uv run examples/<file>`. They are designed to be read in

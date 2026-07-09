@@ -1,8 +1,9 @@
 .DEFAULT_GOAL := help
 
 EXAMPLE ?= examples/01_spark_session.py
+IMAGE ?= pyspark-primer
 
-.PHONY: help install format lint test test-v run java-version check-all clean
+.PHONY: help install format lint test test-v run java-version docker-build docker-run docker-test check-all clean
 
 help:  ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-14s %s\n", $$1, $$2}'
@@ -28,6 +29,15 @@ run:  ## Run one example (override with EXAMPLE=examples/02_dataframes.py)
 
 java-version:  ## Show the Java version used by Spark
 	java -version
+
+docker-build:  ## Build the Docker image
+	docker build -t $(IMAGE) .
+
+docker-run:  ## Run one example in Docker (override with EXAMPLE=...)
+	docker run --rm $(IMAGE) $(EXAMPLE)
+
+docker-test:  ## Run the test suite in Docker
+	docker run --rm $(IMAGE) python -m pytest
 
 check-all: install format lint test clean  ## Run format, lint, test, and clean
 	@echo "All checks passed!"
