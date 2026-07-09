@@ -3,7 +3,7 @@
 EXAMPLE ?= examples/01_spark_session.py
 IMAGE ?= pyspark-primer
 
-.PHONY: help install format lint test test-v run java-version docker-build docker-run docker-test check-all clean
+.PHONY: help install format lint test test-v run java-version docker-build docker-run docker-test docker-clean check-all clean
 
 help:  ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-14s %s\n", $$1, $$2}'
@@ -38,6 +38,9 @@ docker-run:  ## Run one example in Docker (override with EXAMPLE=...)
 
 docker-test:  ## Run the test suite in Docker
 	docker run --rm $(IMAGE) python -m pytest
+
+docker-clean:  ## Remove the Docker image built by docker-build
+	-docker rmi $(IMAGE)
 
 check-all: install format lint test clean  ## Run format, lint, test, and clean
 	@echo "All checks passed!"
