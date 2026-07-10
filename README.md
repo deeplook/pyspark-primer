@@ -194,6 +194,10 @@ and prints a three-way matrix:
 uv run examples/sail_compat.py
 ```
 
+A recorded demo session — click the image to play it on [Asciinema]:
+
+[![asciicast](https://asciinema.org/a/kgb1SneUodn9CQf6.png)](https://asciinema.org/a/kgb1SneUodn9CQf6)
+
 - ✅ **pass** — ran cleanly, exactly as on classic PySpark.
 - ⚠️ **no-op** — ran and produced correct results, but Sail logged that an
   operation isn't supported yet and was silently ignored.
