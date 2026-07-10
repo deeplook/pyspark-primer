@@ -187,20 +187,31 @@ reported timings).
 ### Compatibility matrix
 
 Because Sail speaks Spark Connect, most of the tutorial examples run against it
-unmodified. `examples/sail_compat.py` starts a Sail server and runs every
-numbered example against it, printing a pass/fail table:
+unmodified. `examples/sail_compat.py` runs every numbered example against Sail
+and prints a three-way matrix:
 
 ```bash
 uv run examples/sail_compat.py
 ```
 
-At the time of writing, 20 of the 21 examples run unchanged on Sail. The lone
-exception is `13_partitioning.py`, which calls `df.rdd.getNumPartitions()` —
-the low-level RDD API is not part of the Spark Connect protocol, so it fails on
-any Connect backend, not just Sail (it runs fine on classic PySpark). The examples are run untouched (a small
-subprocess preamble redirects their hardcoded `local[*]` session to Sail via
-`SPARK_REMOTE`). It's a report, not a gate, and exits 0 even with failures;
-pass `--fail-on-error` for CI-style behavior.
+- ✅ **pass** — ran cleanly, exactly as on classic PySpark.
+- ⚠️ **no-op** — ran and produced correct results, but Sail logged that an
+  operation isn't supported yet and was silently ignored.
+- ❌ **fail** — raised an error Sail (or Spark Connect) couldn't handle.
+
+At the time of writing: **18 clean, 2 no-ops, 1 incompatible.**
+
+- `13_partitioning.py` ❌ calls `df.rdd.getNumPartitions()`. The low-level RDD
+  API is not part of the Spark Connect protocol, so it fails on any Connect
+  backend, not just Sail (it runs fine on classic PySpark).
+- `19_caching.py` ⚠️ — `persist`/`unpersist` are no-ops on Sail.
+- `20_broadcast_joins.py` ⚠️ — the broadcast `hint` is a no-op; Sail's planner
+  chooses its own join strategy.
+
+The examples run untouched: each is executed in a subprocess that starts a
+private Sail server and redirects the hardcoded `local[*]` session to it via
+`SPARK_REMOTE`. It's a report, not a gate, and exits 0 even with failures; pass
+`--fail-on-error` for CI-style behavior.
 
 ## Running all tests
 

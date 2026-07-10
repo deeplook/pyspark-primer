@@ -3,15 +3,24 @@ Sail compatibility matrix — which tutorial examples run unchanged on Sail?
 
 `Sail <https://github.com/lakehq/sail>`_ implements the Spark Connect protocol,
 so in principle the same DataFrame code that runs on classic PySpark also runs
-against a Sail server. This script puts that claim to the test: it starts one
-in-process Sail server and runs every numbered ``examples/NN_*.py`` against it,
-reporting a pass/fail table.
+against a Sail server. This script puts that claim to the test: it runs every
+numbered ``examples/NN_*.py`` against Sail and reports a three-way matrix:
+
+* ✅ **pass** — ran cleanly, exactly as on classic PySpark.
+* ⚠️ **no-op** — ran and succeeded, but Sail logged a warning that some
+  operation isn't supported yet and was silently ignored (e.g. a broadcast
+  ``hint``). The code works, but not every optimization took effect.
+* ❌ **fail** — raised an error Sail (or the Spark Connect protocol) couldn't
+  handle.
 
 The examples are untouched — they hardcode ``.master("local[*]")`` and a
-driver-only Log4j ``.config(...)``. Each example is run in a subprocess whose
-``SPARK_REMOTE`` points at the Sail server, with a tiny preamble that
-neutralizes ``.master()`` and the driver-only config so the session is routed
-to Sail instead of a local JVM. Nothing in ``examples/`` is modified.
+driver-only Log4j ``.config(...)``. Each example runs in its own subprocess
+that starts a private in-process Sail server, points ``SPARK_REMOTE`` at it,
+and neutralizes ``.master()`` and the driver-only config so the session is
+routed to Sail instead of a local JVM. A per-example server is what lets each
+subprocess capture Sail's own ``WARN`` log lines (they come from the server,
+not the client), which is how the ⚠️ no-ops are detected. Nothing in
+``examples/`` is modified.
 
 This is a *report*, not a test: by default it exits 0 even when some examples
 fail, because the failures are the interesting part. Pass ``--fail-on-error``
@@ -26,19 +35,25 @@ Requires the optional ``sail`` dependency group::
 from __future__ import annotations
 
 import argparse
-import os
 import subprocess
 import sys
 from pathlib import Path
 
 EXAMPLES_DIR = Path(__file__).resolve().parent
 
-# Run inside each subprocess before the example: route the hardcoded local
-# session to Sail via SPARK_REMOTE by making .master() a no-op, and swallow the
-# driver-only .config() (Log4j options that don't apply to a remote engine).
+# Run inside each subprocess before the example: start a private Sail server,
+# route the hardcoded local session to it via SPARK_REMOTE by making .master()
+# a no-op, and swallow the driver-only .config() (Log4j options that don't
+# apply to a remote engine). The private server means this subprocess's stderr
+# also carries Sail's own WARN lines, which flag unsupported no-ops.
 RUNNER_PREAMBLE = """
-import sys, runpy
+import os, sys, runpy
 from pyspark.sql import SparkSession
+from pysail.spark import SparkConnectServer
+_server = SparkConnectServer("127.0.0.1", 0)
+_server.start(background=True)
+_host, _port = _server.listening_address
+os.environ["SPARK_REMOTE"] = f"sc://{{_host}}:{{_port}}"
 SparkSession.Builder.master = lambda self, *a, **k: self
 _orig_config = SparkSession.Builder.config
 def _safe_config(self, *a, **k):
@@ -59,8 +74,8 @@ def numbered_examples() -> list[Path]:
 def failure_reason(stderr: str) -> str:
     """Pull the most useful line out of a failed run's stderr.
 
-    Sail logs INFO/WARN lines to stderr; skip those and return the last real
-    line, which is normally the exception type and message.
+    Sail logs timestamped INFO/WARN lines to stderr; skip those and return the
+    last real line, which is normally the exception type and message.
     """
     lines = [
         line.rstrip()
@@ -70,22 +85,41 @@ def failure_reason(stderr: str) -> str:
     return lines[-1][:160] if lines else "(no error output captured)"
 
 
-def run_example(example: Path, remote_url: str, timeout: float) -> tuple[bool, str]:
+def sail_warnings(stderr: str) -> list[str]:
+    """Distinct Sail WARN messages, e.g. "... is not yet supported ... no-op"."""
+    messages = {
+        line.split("] ", 1)[1].strip()
+        for line in stderr.splitlines()
+        if " WARN " in line and "sail" in line and "] " in line
+    }
+    return sorted(messages)
+
+
+def run_example(example: Path, timeout: float) -> tuple[str, str]:
+    """Run one example against a private Sail server.
+
+    Returns ``(status, detail)`` where status is ``"ok"``, ``"warn"``, or
+    ``"fail"``; detail is the warning text (warn) or the error line (fail).
+    """
     preamble = RUNNER_PREAMBLE.format(examples=str(EXAMPLES_DIR))
-    env = dict(os.environ, SPARK_REMOTE=remote_url)
     try:
         result = subprocess.run(
             [sys.executable, "-c", preamble, str(example)],
-            env=env,
             capture_output=True,
             text=True,
             timeout=timeout,
         )
     except subprocess.TimeoutExpired:
-        return False, f"timed out after {timeout:.0f}s"
-    if result.returncode == 0:
-        return True, ""
-    return False, failure_reason(result.stderr)
+        return "fail", f"timed out after {timeout:.0f}s"
+    if result.returncode != 0:
+        return "fail", failure_reason(result.stderr)
+    warnings = sail_warnings(result.stderr)
+    if warnings:
+        return "warn", "; ".join(warnings)
+    return "ok", ""
+
+
+MARKS = {"ok": "✅", "warn": "⚠️", "fail": "❌"}
 
 
 def main() -> None:
@@ -106,39 +140,38 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    from pysail.spark import SparkConnectServer
-
-    server = SparkConnectServer("127.0.0.1", 0)
-    server.start(background=True)
-    host, port = server.listening_address
-    remote_url = f"sc://{host}:{port}"
-
     examples = numbered_examples()
     name_width = max(len(e.name) for e in examples)
-    print(f"Running {len(examples)} examples against Sail at {remote_url}\n")
+    print(f"Running {len(examples)} examples against Sail\n")
 
-    passed = 0
-    failures: list[tuple[str, str]] = []
+    counts = {"ok": 0, "warn": 0, "fail": 0}
+    warned: list[tuple[str, str]] = []
+    failed: list[tuple[str, str]] = []
     for example in examples:
-        ok, reason = run_example(example, remote_url, args.timeout)
-        mark = "✅" if ok else "❌"
-        detail = "" if ok else f"  {reason}"
-        print(f"  {mark} {example.name:<{name_width}}{detail}")
-        if ok:
-            passed += 1
-        else:
-            failures.append((example.name, reason))
-
-    server.stop()
+        status, detail = run_example(example, args.timeout)
+        counts[status] += 1
+        suffix = f"  {detail}" if detail else ""
+        print(f"  {MARKS[status]} {example.name:<{name_width}}{suffix}")
+        if status == "warn":
+            warned.append((example.name, detail))
+        elif status == "fail":
+            failed.append((example.name, detail))
 
     total = len(examples)
-    print(f"\n{passed}/{total} examples run unchanged on Sail.")
-    if failures:
+    print(
+        f"\n{counts['ok']} clean, {counts['warn']} with no-op warnings, "
+        f"{counts['fail']} incompatible (of {total})."
+    )
+    if warned:
+        print("\nRan with unsupported no-ops:")
+        for name, detail in warned:
+            print(f"  - {name}: {detail}")
+    if failed:
         print("\nIncompatible:")
-        for name, reason in failures:
-            print(f"  - {name}: {reason}")
+        for name, detail in failed:
+            print(f"  - {name}: {detail}")
 
-    if args.fail_on_error and failures:
+    if args.fail_on_error and failed:
         raise SystemExit(1)
 
 
