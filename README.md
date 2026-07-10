@@ -163,6 +163,45 @@ order — each one builds on concepts introduced by the previous.
 | `examples/20_broadcast_joins.py`  | Broadcast joins — eliminating shuffle for small lookup tables |
 | `examples/21_sampling.py`         | Train/test split — `randomSplit`, `sample`, bootstrapping |
 
+## Sail vs. PySpark benchmark
+
+[Sail](https://github.com/lakehq/sail) is a Rust-native, single-process engine
+that speaks the Spark Connect protocol, so the *same* DataFrame code can run on
+either classic PySpark (a local JVM engine) or Sail (an in-process `sc://`
+server). `examples/sail_vs_pyspark.py` runs one shared workload on both,
+verifies they produce identical results, and reports the wall-clock time of
+each.
+
+Sail lives in an optional dependency group (it pulls in the Spark Connect
+client extras), so install it explicitly:
+
+```bash
+uv sync --group sail
+uv run examples/sail_vs_pyspark.py --rows 5000000 --runs 3
+```
+
+`--rows` sets how many rows to generate and `--runs` how many timed runs to do
+per engine (the first is a warm-up, so start-up cost is excluded from the
+reported timings).
+
+### Compatibility matrix
+
+Because Sail speaks Spark Connect, most of the tutorial examples run against it
+unmodified. `examples/sail_compat.py` starts a Sail server and runs every
+numbered example against it, printing a pass/fail table:
+
+```bash
+uv run examples/sail_compat.py
+```
+
+At the time of writing, 20 of the 21 examples run unchanged on Sail. The lone
+exception is `13_partitioning.py`, which calls `df.rdd.getNumPartitions()` —
+the low-level RDD API is not part of the Spark Connect protocol, so it fails on
+any Connect backend, not just Sail (it runs fine on classic PySpark). The examples are run untouched (a small
+subprocess preamble redirects their hardcoded `local[*]` session to Sail via
+`SPARK_REMOTE`). It's a report, not a gate, and exits 0 even with failures;
+pass `--fail-on-error` for CI-style behavior.
+
 ## Running all tests
 
 A pytest suite checks that every module runs without errors:

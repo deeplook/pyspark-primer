@@ -47,3 +47,10 @@ dev = [
     "mypy>=1.0",
     "pytest>=9.0.3",
 ]
+# Sail (https://github.com/lakehq/sail) is a Rust-native, Spark Connect
+# compatible engine. Installing it pulls in the Spark Connect client extras
+# (grpc, pyarrow, ...) needed to talk to a Sail server from PySpark.
+sail = [
+    "pysail>=0.6.6",
+    "pyspark[connect]>=4.1.1",
+]
