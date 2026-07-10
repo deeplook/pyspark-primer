@@ -196,7 +196,7 @@ uv run examples/sail_compat.py
 
 A recorded demo session — click the image to play it on [Asciinema]:
 
-[![asciicast](https://asciinema.org/a/kgb1SneUodn9CQf6.png)](https://asciinema.org/a/kgb1SneUodn9CQf6)
+[![asciicast](https://asciinema.org/a/HHy2gnewI8mQJh13.png)](https://asciinema.org/a/HHy2gnewI8mQJh13)
 
 - `succ` (green badge) — ran cleanly, exactly as on classic PySpark.
 - `warn` (yellow badge) — ran and produced correct results, but Sail logged
