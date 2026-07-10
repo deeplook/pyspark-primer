@@ -28,12 +28,12 @@ df = spark.createDataFrame(
 )
 
 
-@udf(StringType())
+@udf(StringType(), useArrow=False)
 def email_domain(email: str) -> str:
     return email.split("@")[-1] if email else None
 
 
-@udf(StringType())
+@udf(StringType(), useArrow=False)
 def grade(score: int) -> str:
     if score is None:
         return None
