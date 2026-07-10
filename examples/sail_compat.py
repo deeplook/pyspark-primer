@@ -6,15 +6,15 @@ so in principle the same DataFrame code that runs on classic PySpark also runs
 against a Sail server. This script puts that claim to the test: it runs every
 numbered ``examples/NN_*.py`` against Sail and reports a three-way matrix:
 
-* ``✓`` (green) **pass** — ran cleanly, exactly as on classic PySpark.
-* ``!`` (yellow) **no-op** — ran and succeeded, but Sail logged a warning that
+* ``succ`` (green badge) — ran cleanly, exactly as on classic PySpark.
+* ``warn`` (yellow badge) — ran and succeeded, but Sail logged a warning that
   some operation isn't supported yet and was silently ignored (e.g. a broadcast
   ``hint``). The code works, but not every optimization took effect.
-* ``✗`` (red) **fail** — raised an error Sail (or the Spark Connect protocol)
+* ``fail`` (red badge) — raised an error Sail (or the Spark Connect protocol)
   couldn't handle.
 
-Plain ASCII/BMP glyphs plus ANSI colour are used (rather than emoji) so the
-markers render in terminals, asciinema recordings, and CI logs alike.
+The markers are ASCII text badges on an ANSI-coloured background (not emoji, so
+they render in terminals, asciinema recordings, and CI logs alike).
 
 The examples are untouched — they hardcode ``.master("local[*]")`` and a
 driver-only Log4j ``.config(...)``. Each example runs in its own subprocess
@@ -123,19 +123,20 @@ def run_example(example: Path, timeout: float) -> tuple[str, str]:
     return "ok", ""
 
 
-# Single-width glyphs (present in normal monospace fonts) plus ANSI colour,
-# rather than emoji — emoji render as missing-glyph boxes in asciinema and
-# many terminals.
-_SYMBOLS = {"ok": "✓", "warn": "!", "fail": "✗"}
-_COLORS = {"ok": "32", "warn": "33", "fail": "31"}  # green / yellow / red
+# Fixed-width text badges rendered as bold labels on a coloured background —
+# ASCII only (no emoji, which show as missing-glyph boxes in asciinema and many
+# terminals). Foreground/background SGR codes: black-on-green, black-on-yellow,
+# white-on-red.
+_LABELS = {"ok": "succ", "warn": "warn", "fail": "fail"}
+_STYLES = {"ok": "30;42", "warn": "30;43", "fail": "97;41"}
 
 
 def mark(status: str) -> str:
-    symbol = _SYMBOLS[status]
+    label = _LABELS[status]
     use_color = sys.stdout.isatty() and "NO_COLOR" not in os.environ
     if use_color:
-        return f"\033[1;{_COLORS[status]}m{symbol}\033[0m"
-    return symbol
+        return f"\033[1;{_STYLES[status]}m {label} \033[0m"
+    return f"[{label}]"
 
 
 def main() -> None:

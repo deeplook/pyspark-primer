@@ -198,10 +198,10 @@ A recorded demo session — click the image to play it on [Asciinema]:
 
 [![asciicast](https://asciinema.org/a/kgb1SneUodn9CQf6.png)](https://asciinema.org/a/kgb1SneUodn9CQf6)
 
-- `✓` green **pass** — ran cleanly, exactly as on classic PySpark.
-- `!` yellow **no-op** — ran and produced correct results, but Sail logged that
-  an operation isn't supported yet and was silently ignored.
-- `✗` red **fail** — raised an error Sail (or Spark Connect) couldn't handle.
+- `succ` (green badge) — ran cleanly, exactly as on classic PySpark.
+- `warn` (yellow badge) — ran and produced correct results, but Sail logged
+  that an operation isn't supported yet and was silently ignored.
+- `fail` (red badge) — raised an error Sail (or Spark Connect) couldn't handle.
 
 At the time of writing: **18 clean, 2 no-ops, 1 incompatible.**
 
