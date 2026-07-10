@@ -198,19 +198,19 @@ A recorded demo session — click the image to play it on [Asciinema]:
 
 [![asciicast](https://asciinema.org/a/kgb1SneUodn9CQf6.png)](https://asciinema.org/a/kgb1SneUodn9CQf6)
 
-- ✅ **pass** — ran cleanly, exactly as on classic PySpark.
-- ⚠️ **no-op** — ran and produced correct results, but Sail logged that an
-  operation isn't supported yet and was silently ignored.
-- ❌ **fail** — raised an error Sail (or Spark Connect) couldn't handle.
+- `✓` green **pass** — ran cleanly, exactly as on classic PySpark.
+- `!` yellow **no-op** — ran and produced correct results, but Sail logged that
+  an operation isn't supported yet and was silently ignored.
+- `✗` red **fail** — raised an error Sail (or Spark Connect) couldn't handle.
 
 At the time of writing: **18 clean, 2 no-ops, 1 incompatible.**
 
-- `13_partitioning.py` ❌ calls `df.rdd.getNumPartitions()`. The low-level RDD
-  API is not part of the Spark Connect protocol, so it fails on any Connect
+- `13_partitioning.py` (fail) calls `df.rdd.getNumPartitions()`. The low-level
+  RDD API is not part of the Spark Connect protocol, so it fails on any Connect
   backend, not just Sail (it runs fine on classic PySpark).
-- `19_caching.py` ⚠️ — `persist`/`unpersist` are no-ops on Sail.
-- `20_broadcast_joins.py` ⚠️ — the broadcast `hint` is a no-op; Sail's planner
-  chooses its own join strategy.
+- `19_caching.py` (no-op) — `persist`/`unpersist` are no-ops on Sail.
+- `20_broadcast_joins.py` (no-op) — the broadcast `hint` is a no-op; Sail's
+  planner chooses its own join strategy.
 
 The examples run untouched: each is executed in a subprocess that starts a
 private Sail server and redirects the hardcoded `local[*]` session to it via
