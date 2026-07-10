@@ -121,9 +121,9 @@ def main() -> None:
     failures: list[tuple[str, str]] = []
     for example in examples:
         ok, reason = run_example(example, remote_url, args.timeout)
-        mark = "PASS" if ok else "FAIL"
+        mark = "✅" if ok else "❌"
         detail = "" if ok else f"  {reason}"
-        print(f"  [{mark}] {example.name:<{name_width}}{detail}")
+        print(f"  {mark} {example.name:<{name_width}}{detail}")
         if ok:
             passed += 1
         else:
