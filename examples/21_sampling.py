@@ -7,10 +7,9 @@ fraction for quick exploration or bootstrapping. Both accept a seed so
 results are reproducible across runs.
 """
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
-
-from _spark_config import configure_spark
 
 spark = configure_spark(
     SparkSession.builder.appName("sampling").master("local[*]")

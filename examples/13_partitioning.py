@@ -8,10 +8,9 @@ aggregations on that column. explain() prints the physical query plan so you
 can see what Spark will actually do before it runs.
 """
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, spark_partition_id
-
-from _spark_config import configure_spark
 
 spark = configure_spark(
     SparkSession.builder.appName("partitioning").master("local[*]")

@@ -6,9 +6,8 @@ spark.sql(). Useful when SQL is more readable than the DataFrame API.
 Demonstrates aggregations, filtering, and ordering on a small orders dataset.
 """
 
-from pyspark.sql import SparkSession
-
 from _spark_config import configure_spark
+from pyspark.sql import SparkSession
 
 spark = configure_spark(
     SparkSession.builder.appName("sql").master("local[*]")

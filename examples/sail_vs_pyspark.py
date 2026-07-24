@@ -27,12 +27,11 @@ import argparse
 import time
 from statistics import median
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import avg, col
 from pyspark.sql.functions import count as spark_count
 from pyspark.sql.functions import sum as spark_sum
-
-from _spark_config import configure_spark
 
 
 def run_workload(spark: SparkSession, n_rows: int) -> tuple[int, int]:

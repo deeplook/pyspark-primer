@@ -7,30 +7,35 @@ common categories: column selection, string ops, math, dates, casting, and
 conditional logic.
 """
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
-    col,
-    lit,
-    upper,
-    lower,
-    length,
-    substring,
-    concat,
-    trim,
-    round as spark_round,
     abs as spark_abs,
-    sqrt,
-    pow as spark_pow,
+)
+from pyspark.sql.functions import (
+    coalesce,
+    col,
+    concat,
     current_date,
     date_format,
     datediff,
+    length,
+    lit,
+    lower,
+    sqrt,
+    substring,
     to_date,
+    trim,
+    upper,
     when,
-    coalesce,
+)
+from pyspark.sql.functions import (
+    pow as spark_pow,
+)
+from pyspark.sql.functions import (
+    round as spark_round,
 )
 from pyspark.sql.types import DoubleType
-
-from _spark_config import configure_spark
 
 spark = configure_spark(
     SparkSession.builder.appName("functions").master("local[*]")

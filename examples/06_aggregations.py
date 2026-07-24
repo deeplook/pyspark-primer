@@ -7,20 +7,27 @@ columns — useful for cross-tabulation. These are all executed on the JVM
 with no Python serialisation overhead.
 """
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
+    avg,
     col,
     count,
     countDistinct,
-    avg,
-    sum as spark_sum,
-    min as spark_min,
-    max as spark_max,
-    round as spark_round,
     stddev,
 )
-
-from _spark_config import configure_spark
+from pyspark.sql.functions import (
+    max as spark_max,
+)
+from pyspark.sql.functions import (
+    min as spark_min,
+)
+from pyspark.sql.functions import (
+    round as spark_round,
+)
+from pyspark.sql.functions import (
+    sum as spark_sum,
+)
 
 spark = configure_spark(
     SparkSession.builder.appName("aggregations").master("local[*]")

@@ -10,9 +10,8 @@ back the full dataset or a single partition directory.
 import os
 from pathlib import Path
 
-from pyspark.sql import SparkSession
-
 from _spark_config import configure_spark
+from pyspark.sql import SparkSession
 
 spark = configure_spark(
     SparkSession.builder.appName("write-read").master("local[*]")

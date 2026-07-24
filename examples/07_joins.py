@@ -6,9 +6,8 @@ dataset. Inner keeps only matched rows; left keeps all left-side rows (unmatched
 right side becomes null); outer keeps everything from both sides.
 """
 
-from pyspark.sql import SparkSession
-
 from _spark_config import configure_spark
+from pyspark.sql import SparkSession
 
 spark = configure_spark(
     SparkSession.builder.appName("joins").master("local[*]")

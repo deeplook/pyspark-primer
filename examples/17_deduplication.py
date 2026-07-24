@@ -7,9 +7,8 @@ the first occurrence and preserving all other columns — the more useful
 form in ETL pipelines where a surrogate id or timestamp differs per copy.
 """
 
-from pyspark.sql import SparkSession
-
 from _spark_config import configure_spark
+from pyspark.sql import SparkSession
 
 spark = configure_spark(
     SparkSession.builder.appName("dedup").master("local[*]")

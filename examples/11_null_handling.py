@@ -7,10 +7,9 @@ for conditional replacement. Demonstrates all three approaches on a small
 dataset with intentional gaps.
 """
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, when
-
-from _spark_config import configure_spark
 
 spark = configure_spark(
     SparkSession.builder.appName("nulls").master("local[*]")

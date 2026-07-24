@@ -6,10 +6,9 @@ from a Python list. Covers createDataFrame(), show(), printSchema(), filter()
 to select rows by condition, and groupBy() with count() to aggregate.
 """
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
-
-from _spark_config import configure_spark
 
 spark = configure_spark(
     SparkSession.builder.appName("test").master("local[*]")

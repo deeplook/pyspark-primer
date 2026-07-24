@@ -10,10 +10,9 @@ SortMergeJoin so you can confirm the plan is what you expect.
 
 import time
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import broadcast, col
-
-from _spark_config import configure_spark
 
 spark = configure_spark(
     SparkSession.builder.appName("broadcast").master("local[*]")

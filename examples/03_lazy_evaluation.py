@@ -10,10 +10,9 @@ This design lets Spark optimise the entire pipeline before running a single
 task. Use explain() to inspect the plan; use count() / show() to execute it.
 """
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
-
-from _spark_config import configure_spark
 
 spark = configure_spark(
     SparkSession.builder.appName("lazy").master("local[*]")

@@ -9,11 +9,10 @@ Always unpersist() when done to free executor memory.
 
 import time
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 from pyspark.storagelevel import StorageLevel
-
-from _spark_config import configure_spark
 
 spark = configure_spark(
     SparkSession.builder.appName("caching").master("local[*]")

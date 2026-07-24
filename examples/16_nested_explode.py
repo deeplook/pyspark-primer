@@ -7,10 +7,9 @@ the array index. explode() on a map column produces one row per key-value
 pair; map_keys() / map_values() extract them as arrays instead.
 """
 
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, explode, posexplode, map_keys, map_values
-
 from _spark_config import configure_spark
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, explode, map_keys, map_values, posexplode
 
 spark = configure_spark(
     SparkSession.builder.appName("nested").master("local[*]")

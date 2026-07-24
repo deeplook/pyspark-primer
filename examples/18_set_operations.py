@@ -8,9 +8,8 @@ intersect() returns rows common to both; subtract() returns rows in the
 left side that do not appear on the right.
 """
 
-from pyspark.sql import SparkSession
-
 from _spark_config import configure_spark
+from pyspark.sql import SparkSession
 
 spark = configure_spark(
     SparkSession.builder.appName("set-ops").master("local[*]")

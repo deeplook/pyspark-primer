@@ -137,7 +137,9 @@ docker run --rm -v "$PWD/examples:/app/examples" pyspark-primer examples/02_data
 ## Modules
 
 Run any script with `uv run examples/<file>`. They are designed to be read in
-order — each one builds on concepts introduced by the previous.
+order, grouped here into five thematic blocks.
+
+### Core DataFrame basics
 
 | File | Topic |
 |------|-------|
@@ -145,23 +147,43 @@ order — each one builds on concepts introduced by the previous.
 | `examples/02_dataframes.py`       | In-memory DataFrames — `createDataFrame`, `show`, `filter`, `groupBy` |
 | `examples/03_lazy_evaluation.py`  | Lazy evaluation — transformations vs actions, `explain()` |
 | `examples/04_column_functions.py` | Column expressions — string, math, date functions, `when`/`coalesce` |
-| `examples/05_reading_csv.py`      | Reading CSV — `inferSchema`, `printSchema`, basic aggregations |
+
+### Reading & writing data
+
+| File | Topic |
+|------|-------|
+| `examples/05_reading_csv.py`   | Reading CSV — `inferSchema`, `printSchema`, basic aggregations |
+| `examples/10_parquet.py`       | Writing & reading Parquet — `partitionBy`, partition pruning |
+| `examples/15_reading_json.py`  | Reading JSON — nested structs, `ArrayType`, dot-notation access |
+
+### Aggregations, joins & SQL
+
+| File | Topic |
+|------|-------|
 | `examples/06_aggregations.py`     | Aggregations — multi-function `agg`, `countDistinct`, `pivot` |
 | `examples/07_joins.py`            | Joins — inner, left, and full outer joins |
 | `examples/08_sql_interface.py`    | SQL interface — `createOrReplaceTempView`, `spark.sql()` |
 | `examples/09_window_functions.py` | Window functions — `rank`, `lag`, running totals |
-| `examples/10_parquet.py`          | Writing & reading Parquet — `partitionBy`, partition pruning |
-| `examples/11_null_handling.py`    | Handling nulls — `na.drop`, `na.fill`, `when`/`otherwise` |
-| `examples/12_udfs.py`             | User-Defined Functions (UDFs) — custom Python logic on columns |
-| `examples/13_partitioning.py`     | Partitioning & query plans — `repartition`, `coalesce`, `explain()` |
-| `examples/14_schemas.py`          | Explicit schemas — `StructType`, `StructField`, DDL strings |
-| `examples/15_reading_json.py`     | Reading JSON — nested structs, `ArrayType`, dot-notation access |
-| `examples/16_nested_explode.py`   | Nested data — `explode`, `posexplode`, `map_keys`/`map_values` |
 | `examples/17_deduplication.py`    | Deduplication — `distinct`, `dropDuplicates` by key |
 | `examples/18_set_operations.py`   | Set operations — `union`, `unionByName`, `intersect`, `subtract` |
-| `examples/19_caching.py`          | Caching — `cache`, `persist`, `unpersist`, storage levels |
-| `examples/20_broadcast_joins.py`  | Broadcast joins — eliminating shuffle for small lookup tables |
-| `examples/21_sampling.py`         | Train/test split — `randomSplit`, `sample`, bootstrapping |
+
+### Schemas & complex types
+
+| File | Topic |
+|------|-------|
+| `examples/11_null_handling.py`  | Handling nulls — `na.drop`, `na.fill`, `when`/`otherwise` |
+| `examples/14_schemas.py`        | Explicit schemas — `StructType`, `StructField`, DDL strings |
+| `examples/16_nested_explode.py` | Nested data — `explode`, `posexplode`, `map_keys`/`map_values` |
+
+### Performance, UDFs & sampling
+
+| File | Topic |
+|------|-------|
+| `examples/12_udfs.py`            | User-Defined Functions (UDFs) — custom Python logic on columns |
+| `examples/13_partitioning.py`    | Partitioning & query plans — `repartition`, `coalesce`, `explain()` |
+| `examples/19_caching.py`         | Caching — `cache`, `persist`, `unpersist`, storage levels |
+| `examples/20_broadcast_joins.py` | Broadcast joins — eliminating shuffle for small lookup tables |
+| `examples/21_sampling.py`        | Train/test split — `randomSplit`, `sample`, bootstrapping |
 
 ## Sail vs. PySpark benchmark
 

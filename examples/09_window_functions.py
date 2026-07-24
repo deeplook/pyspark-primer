@@ -6,11 +6,11 @@ keeping every row. Demonstrates rank(), lag() (previous row's value), and a
 running sum — all partitioned per person and ordered by month.
 """
 
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, rank, lag, sum as spark_sum
-from pyspark.sql.window import Window
-
 from _spark_config import configure_spark
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, lag, rank
+from pyspark.sql.functions import sum as spark_sum
+from pyspark.sql.window import Window
 
 spark = configure_spark(
     SparkSession.builder.appName("windows").master("local[*]")

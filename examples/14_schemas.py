@@ -7,17 +7,16 @@ lets you mark columns nullable=False, which the optimiser can exploit.
 A DDL string ("id INT NOT NULL, name STRING") is a terser alternative.
 """
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.types import (
-    StructType,
-    StructField,
+    BooleanType,
+    DoubleType,
     IntegerType,
     StringType,
-    DoubleType,
-    BooleanType,
+    StructField,
+    StructType,
 )
-
-from _spark_config import configure_spark
 
 spark = configure_spark(
     SparkSession.builder.appName("schemas").master("local[*]")

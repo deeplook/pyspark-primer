@@ -10,10 +10,9 @@ Nested fields are accessed with dot notation: col("address.city").
 import json
 from pathlib import Path
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
-
-from _spark_config import configure_spark
 
 spark = configure_spark(
     SparkSession.builder.appName("json").master("local[*]")

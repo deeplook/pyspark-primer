@@ -7,11 +7,10 @@ so prefer built-ins where possible. Demonstrates extracting an email domain
 and converting a numeric score to a letter grade.
 """
 
+from _spark_config import configure_spark
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, udf
-from pyspark.sql.types import StringType, IntegerType
-
-from _spark_config import configure_spark
+from pyspark.sql.types import IntegerType, StringType
 
 spark = configure_spark(
     SparkSession.builder.appName("udfs").master("local[*]")
