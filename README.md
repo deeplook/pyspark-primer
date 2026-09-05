@@ -1,6 +1,7 @@
 # PySpark-Primer
 
 [![CI](https://github.com/deeplook/pyspark-primer/actions/workflows/ci.yml/badge.svg)](https://github.com/deeplook/pyspark-primer/actions/workflows/ci.yml)
+[![Downloads](https://img.shields.io/github/downloads/deeplook/pyspark-primer/total?label=Downloads&logo=github)](https://github.com/deeplook/pyspark-primer/releases)
 [![License](https://img.shields.io/github/license/deeplook/pyspark-primer)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/downloads/release/python-3120/)
 [![Apache Spark](https://img.shields.io/badge/Apache%20Spark-4.1-E25A1C?logo=apachespark&logoColor=white)](https://spark.apache.org/)
